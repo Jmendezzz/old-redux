@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deposit, payLoan, withdraw } from "./accountSlice";
 
 function AccountOperations() {
   const [depositAmount, setDepositAmount] = useState("");
@@ -7,13 +9,45 @@ function AccountOperations() {
   const [loanPurpose, setLoanPurpose] = useState("");
   const [currency, setCurrency] = useState("USD");
 
-  function handleDeposit() {}
+  const dispatch = useDispatch();
+  const account = useSelector((store) => store.account);
 
-  function handleWithdrawal() {}
+  function handleDeposit() {
+    if(!depositAmount) {
+      alert("Please fill in all fields");
+      return;
+    }
+    dispatch(deposit(Number(depositAmount), currency));
+    setDepositAmount("");
+    setCurrency("");
+  }
 
-  function handleRequestLoan() {}
+  function handleWithdrawal() {
+    if(!withdrawalAmount) {
+      alert("Please fill in all fields");
+      return;
+    }
+    if(withdrawalAmount > account.balance) {
+      alert("You don't have enough money");
+      return;
+    }
+    dispatch(withdraw(Number(withdrawalAmount)));
+    setWithdrawalAmount("");
+  }
 
-  function handlePayLoan() {}
+  function handleRequestLoan() {
+    if(!loanAmount || !loanPurpose) {
+      alert("Please fill in all fields");
+      return;
+    }
+    dispatch(withdraw(Number(loanAmount)));
+    setLoanAmount("");
+    setLoanPurpose("");
+  }
+
+  function handlePayLoan() {
+    dispatch(payLoan());
+  }
 
   return (
     <div>
@@ -67,7 +101,7 @@ function AccountOperations() {
         </div>
 
         <div>
-          <span>Pay back $X</span>
+          <span>Pay back {account.loan}</span>
           <button onClick={handlePayLoan}>Pay loan</button>
         </div>
       </div>
