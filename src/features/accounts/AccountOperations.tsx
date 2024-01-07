@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deposit, payLoan, withdraw } from "./accountSlice";
+import { requestLoan } from "./accountSlice-redux";
 
 function AccountOperations() {
   const [depositAmount, setDepositAmount] = useState("");
@@ -40,7 +41,7 @@ function AccountOperations() {
       alert("Please fill in all fields");
       return;
     }
-    dispatch(withdraw(Number(loanAmount)));
+    dispatch(requestLoan(Number(loanAmount), loanPurpose));
     setLoanAmount("");
     setLoanPurpose("");
   }

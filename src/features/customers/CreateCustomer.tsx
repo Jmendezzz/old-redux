@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { createCustomer } from "./customerSlice";
+import { create } from "./customerSlice";
 
 function Customer() {
   const [fullName, setFullName] = useState("");
@@ -13,7 +13,7 @@ function Customer() {
       alert("Please fill in all fields");
       return;
     }
-    dispatch(createCustomer(fullName, nationalId));
+    dispatch(create(fullName, nationalId));
   }
 
   return (

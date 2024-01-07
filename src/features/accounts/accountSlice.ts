@@ -1,44 +1,42 @@
+import { createSlice } from "@reduxjs/toolkit";
+
 const initialState = {
   balance: 0,
   loan: 0,
   loanPurpose: "",
+  isLoading: false
 };
 
-export default function accountReducer(state = initialState, action: any) {
-  switch (action.type) {
-    case "account/deposit":
-      return {
-        ...state,
-        balance: state.balance + action.payload,
-      };
-    case "account/withdraw":
-      return {
-        ...state,
-        balance: state.balance - action.payload,
-      };
-    case "account/requestLoan":
-      if (state.loan > 0) return state;
-      return {
-        ...state,
-        loan: action.payload.amount,
-        loanPurpose: action.payload.purpose,
-        balance: state.balance + action.payload.amount,
-      };
-    case "account/payLoan":
-      return {
-        ...state,
-        loan: 0,
-        loanPurpose: "",
-        balance: state.balance - state.loan,
-      };
-
-    default:
-      return state;
+const accountSlice = createSlice({
+  name:"account",
+  initialState,
+  reducers:{
+    deposit(state, action) {
+      state.balance += action.payload;
+      state.isLoading = false;
+    },
+    withdraw(state, action) {
+      if (state.balance < action.payload) return;
+      state.balance -= action.payload;
+    },
+    requestLoan(state, action) {
+      if (state.loan > 0) return;
+      state.loan = action.payload.amount;
+      state.loanPurpose = action.payload.purpose;
+      state.balance += action.payload.amount;
+    },
+    payLoan(state) {
+      state.loan = 0;
+      state.loanPurpose = "";
+      state.balance -= state.loan;
+    },
+    convertingCurrency(state) {
+      state.isLoading = true;
+    }
   }
-}
+});
 
-// Action Creators: They are just functions that return actions to be dispatched by the store
-
+//This is not implemented in the real took kit way. This is just to work with the thunk middleware.
 export function deposit(amount: number, currency: string) {
   if (currency == "USD") {
     return {
@@ -58,20 +56,7 @@ export function deposit(amount: number, currency: string) {
 
     }
 }
-export function withdraw(amount: number) {
-  return {
-    type: "account/withdraw",
-    payload: amount,
-  };
-}
-export function requestLoan(amount: number, purpose: string) {
-  return {
-    type: "account/requestLoan",
-    payload: { amount, purpose },
-  };
-}
-export function payLoan() {
-  return {
-    type: "account/payLoan",
-  };
-}
+export const { withdraw, requestLoan, payLoan } = accountSlice.actions;
+
+export default accountSlice.reducer;
+
